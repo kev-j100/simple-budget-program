@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+  <link rel="stylesheet" href="jquery-ui-1.11.4/jquery-ui.css">
 </head>
 <body>
 <div id="top-controls">
 +
 </div>
+
 <div id="new-account-form">
-<table>
-<tr><td>Name:</td><td><input type="text" id="accountNameEntered" name="accountNameEntered"/></td></tr>
-<tr><td>Total:</td><td><input type="number" step=".01" id="accountTotalEntered" name="Total" value="0.00"/></td></tr>
-<tr><td>Type:</td><td><input type="text" id="accountTypeEntered" name="accountTypeEntered"/></td></tr>
-<tr><td>Notes:</td><td><textarea rows="4" cols="20" id="accountNotesEntered" name="accountNotesEntered"></textarea></td></tr>
-</table>
-<button type="button" title="Cancel" value="Cancel" id="accountCancel">Cancel</button>
-<button type="button" title="Ok" value="Ok" id="accountOk">Ok</button>
+<form>
+  <fieldset>
+    <label>Name:</label>
+    <input type="text" id="accountNameEntered" name="accountNameEntered"/>
+    <label>Total:</label>
+    <input type="number" step=".01" id="accountTotalEntered" name="Total" value="0.00"/>
+    <label>Type:</label>
+    <input type="text" id="accountTypeEntered" name="accountTypeEntered"/>
+    <label>Notes:</label>
+    <textarea rows="4" cols="20" id="accountNotesEntered" name="accountNotesEntered"></textarea>
+  </fieldset>
+</form>
 </div>
+
 <div id="account-box">
 <table id="account-table">
 <tr id="account-headers"><th>Account</th><th>Total</th></tr>
 </table>
 </div>
 <script src="Dexie.js"></script>
+<script src="jquery-ui-1.11.4/external/jquery/jquery.js"></script>
+<script src="jquery-ui-1.11.4/jquery-ui.js"></script>
 <script src="controls.js"></script>
 </script>
 </body>
