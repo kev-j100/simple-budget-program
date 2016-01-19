@@ -13,18 +13,25 @@ $(function(){
 		accounts: '++id,name,total,type,notes'
 	});
 
-	//Open the database
+//Open the database
 	db.open();
 
 //Initial population of the accounts table
 	db.accounts.each(function (accounts){
-	addToTable(accounts.name,accounts.total);
+	addToTable(accounts.name,accounts.total,accounts.id);
+	addInfoToBody(accounts.name,accounts.total,accounts.type,accounts.notes,accounts.id);
+	makeInfoDialog(accounts.id);
 	});
 
 
 //Adds to the table of accounts
-function addToTable(name,total){
-   accountTable.append("<tr>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "</tr>");
+function addToTable(name,total,id){
+   accountTable.append("<tr>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<div id='infoButton_"+ id +"'>info</div>" + "</td>" + "</tr>");
+}
+
+//Add div to the body for info dialog
+function addInfoToBody(name,total,type,notes,id){
+	$("body").append("<div id='info_"+ id +"' >"+ name +"<br>"+ total +"<br>"+ notes +"</div>");
 }
 
 //Add to the account
@@ -53,10 +60,22 @@ function addAccount(){
 		}
 	});
 
-	accountForm	= dialog.find("form").on("submit",function(event){
+//Form for account
+	accountForm	= dialog.find("#new-account-form-form").on("submit",function(event){
 		event.preventDefault();
 		addAccount();
 	});
+
+function makeInfoDialog(id){
+
+	$("#info_"+id).dialog({
+		autoOpen:false
+	});
+
+	$("#infoButton_"+id).button().click(function(){
+		$("#info_"+id).dialog("open");
+	});
+}
 
 	$("#top-controls").button().on("click",function(){
 		dialog.dialog("open");
