@@ -21,12 +21,13 @@ $(function(){
 	addToTable(accounts.name,accounts.total,accounts.id);
 	addInfoToBody(accounts.name,accounts.total,accounts.type,accounts.notes,accounts.id);
 	makeInfoDialog(accounts.id);
+	makeMenues(accounts.id);
 	});
 
 
 //Adds to the table of accounts
 function addToTable(name,total,id){
-   accountTable.append("<tr>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<div id='infoButton_"+ id +"'>info</div>" + "</td>" + "</tr>");
+   accountTable.append("<tr>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<ul id='menu_"+ id +"'><li>&vellip;<ul><li><div id='infoButton_"+ id +"'>info</div>" + "</li></ul></li></ul></td>" + "</tr>");
 }
 
 //Add div to the body for info dialog
@@ -72,7 +73,7 @@ function makeInfoDialog(id){
 		autoOpen:false
 	});
 
-	$("#infoButton_"+id).button().click(function(){
+	$("#infoButton_"+id).click(function(){
 		$("#info_"+id).dialog("open");
 	});
 }
@@ -80,4 +81,9 @@ function makeInfoDialog(id){
 	$("#top-controls").button().on("click",function(){
 		dialog.dialog("open");
 	});
+
+//Menu ui for account rows
+function makeMenues(id){
+$( "#menu_"+ id ).menu();
+}
 });
