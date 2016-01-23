@@ -17,28 +17,47 @@ $(function(){
 	db.open();
 
 //Initial population of the accounts table
+tableSetup();
+
+//Adds all account items to table
+function tableSetup(){
 	db.accounts.each(function (accounts){
 	addToTable(accounts.name,accounts.total,accounts.id);
 	addInfoToBody(accounts.name,accounts.total,accounts.type,accounts.notes,accounts.id);
 	makeInfoDialog(accounts.id);
 	makeMenues(accounts.id);
+	makeDeleteDialog(accounts.name,accounts.id);
+	deleteAccount(accounts.id);
 	});
+}
 
+//Refresh the table
+function refreshAccountTable(){
+	$(".accountTableRow").remove();
+	$(".infoDiv").remove();
+	$(".deleteAccountDialogDiv").remove();
+	tableSetup();
+}
 
 //Adds to the table of accounts
 function addToTable(name,total,id){
-   accountTable.append("<tr>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<ul id='menu_"+ id +"'><li>&vellip;<ul><li><div id='infoButton_"+ id +"'>info</div>" + "</li></ul></li></ul></td>" + "</tr>");
+   accountTable.append("<tr class='accountTableRow'>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<ul id='menu_"+ id +"'><li>&vellip;<ul><li><div id='infoButton_"+ id +"'>Info</div>" + "</li><li><div id='delete_"+ id +"'>Delete</div></li></ul></li></ul></td>" + "</tr>");
 }
 
 //Add div to the body for info dialog
 function addInfoToBody(name,total,type,notes,id){
-	$("body").append("<div id='info_"+ id +"' >"+ name +"<br>"+ total +"<br>"+ notes +"</div>");
+	$("body").append("<div id='info_"+ id +"' class='infoDiv'>Name: "+ name +"<br>Total: "+ total +"<br>Notes: "+ notes +"</div>");
+}
+
+//Adds in Delete Dialog for each account
+function makeDeleteDialog(name,id){
+	$("body").append("<div id='delete_dialog_"+ id +"' class='deleteAccountDialogDiv'>Are you sure you want to delete the account, "+ name +"?</div>");
 }
 
 //Add to the account
 function addAccount(){
 	db.accounts.add({name:accountName.val(),total:accountTotal.val(),type:accountType.val(),notes:accountNotes.val()});
-	addToTable(accountName.val(),accountTotal.val());
+	refreshAccountTable();
 	dialog.dialog("close");
 	return true;
 }
@@ -86,4 +105,27 @@ function makeInfoDialog(id){
 function makeMenues(id){
 $( "#menu_"+ id ).menu();
 }
+
+//Delete account
+function deleteAccount(id){
+	$("#delete_dialog_"+id).dialog({
+		autoOpen: false,
+		modal: true,
+		buttons: {
+			"Delete": function(){
+				$(this).dialog("close");
+				db.accounts.delete(id);
+				refreshAccountTable();
+			},
+			Cancel: function(){
+				$(this).dialog("close");
+			}
+		}
+	});
+
+	$("#delete_"+id).on("click",function(){
+		$("#delete_dialog_"+id).dialog("open");
+	});
+}
+
 });
