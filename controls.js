@@ -25,7 +25,7 @@ function tableSetup(){
 	addToTable(accounts.name,accounts.total,accounts.id);
 	addInfoToBody(accounts.name,accounts.total,accounts.type,accounts.notes,accounts.id);
 	makeInfoDialog(accounts.id);
-	makeMenues(accounts.id);
+	//makeMenues(accounts.id);
 	makeDeleteDialog(accounts.name,accounts.id);
 	deleteAccount(accounts.id);
 	});
@@ -41,12 +41,19 @@ function refreshAccountTable(){
 
 //Adds to the table of accounts
 function addToTable(name,total,id){
-   accountTable.append("<tr class='accountTableRow'>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<ul id='menu_"+ id +"'><li>&vellip;<ul><li><div id='infoButton_"+ id +"'>Info</div>" + "</li><li><div id='delete_"+ id +"'>Delete</div></li></ul></li></ul></td>" + "</tr>");
+   //accountTable.append("<tr class='accountTableRow'>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<ul id='menu_"+ id +"'><li>&vellip;<ul><li><div id='infoButton_"+ id +"'>Info</div>" + "</li><li id='editButton_"+ id +"'>Edit</li><li><div id='delete_"+ id +"'>Delete</div></li></ul></li></ul></td>" + "</tr>");
+   accountTable.append("<tr class='accountTableRow'>" + "<td>" + name + "</td>" + "<td>" + total + "</td>" + "<td>" + "<td><div id='menuButton"+ id +"' class='menuButton'>&vellip;</div><div id='infoButton_"+ id +"' class='menuItem'>Info</div><div id='editButton_"+ id +"' class='menuItem'>Edit</div><div id='delete_"+ id +"' class='menuItem'>Delete</div></td>" + "</tr>");
+   $('.menuItem').button().hide();
+   $('#menuButton'+id).button().click(function(){
+	   $('#infoButton_'+id).toggle("slow");
+	   $('#editButton_'+id).toggle("slow");
+	   $('#delete_'+id).toggle("slow");
+   });
 }
 
 //Add div to the body for info dialog
 function addInfoToBody(name,total,type,notes,id){
-	$("body").append("<div id='info_"+ id +"' class='infoDiv'>Name: "+ name +"<br>Total: "+ total +"<br>Notes: "+ notes +"</div>");
+	$("body").append("<div id='info_"+ id +"' class='infoDiv'>Name: "+ name +"<br>Total: "+ total +"<br>Type:" +type+ "<br>Notes: "+ notes +"</div>");
 }
 
 //Adds in Delete Dialog for each account
