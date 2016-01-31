@@ -28,6 +28,8 @@ function tableSetup(){
 	//makeMenues(accounts.id);
 	makeDeleteDialog(accounts.name,accounts.id);
 	deleteAccount(accounts.id);
+	makeUpdateDialog(accounts.name,accounts.total,accounts.type,accounts.notes,accounts.id);
+    updateAccount(accounts.id);
 	});
 }
 
@@ -36,6 +38,7 @@ function refreshAccountTable(){
 	$(".accountTableRow").remove();
 	$(".infoDiv").remove();
 	$(".deleteAccountDialogDiv").remove();
+	$(".updateDialogContainDiv").remove();
 	tableSetup();
 }
 
@@ -59,6 +62,11 @@ function addInfoToBody(name,total,type,notes,id){
 //Adds in Delete Dialog for each account
 function makeDeleteDialog(name,id){
 	$("body").append("<div id='delete_dialog_"+ id +"' class='deleteAccountDialogDiv'>Are you sure you want to delete the account, "+ name +"?</div>");
+}
+
+//Adds a dialog to update accounts
+function makeUpdateDialog(name,total,type,notes,id){
+	$("body").append("<div id='updateForm"+id+"' class='updateDialogContainDiv'><form id=update-form-form"+id+"'><fieldset><label>Name:</label><input type='text' id='accountNameEntered' name='accountNameEntered' value='"+name+"'/><label>Total:</label><input type='number' step='.01' id='accountTotalEntered' name='Total' value='0.00'/><label>Type:</label><input type='text' id='accountTypeEntered' name='accountTypeEntered'/><label>Notes:</label><textarea rows='4' cols='20' id='accountNotesEntered' name='accountNotesEntered'></textarea></fieldset></form></div>");
 }
 
 //Add to the account
@@ -93,6 +101,7 @@ function addAccount(){
 		addAccount();
 	});
 
+//Makes the info dialog
 function makeInfoDialog(id){
 
 	$("#info_"+id).dialog({
@@ -135,4 +144,34 @@ function deleteAccount(id){
 	});
 }
 
+function updateAccount(id){
+	$("#updateForm"+id).dialog({
+		autoOpen:false,
+		height: 300,
+		width:350,
+		modal: true,
+		buttons: {
+			"Update Account": function(){
+				$(this).dialog("close");
+				console.log($("#updateForm"+id+" #accountNameEntered").val())
+				db.accounts.update(id,{name: $("#updateForm"+id+" #accountNameEntered").val()});
+				db.accounts.update(id,{total: $("#updateForm"+id+" #accountTotalEntered").val()});
+				db.accounts.update(id,{type: $("#updateForm"+id+" #accountTypeEntered").val()});
+				db.accounts.update(id,{type: $("#updateForm"+id+" #accountNotesEntered").val()});
+			    refreshAccountTable();
+			},
+		Cancel: function(){
+			$("#updateForm"+id).dialog("close");
+		}
+	},
+		close:function(){
+			accountForm[0].reset();
+			allAccountFields.removeClass("ui-state-error");
+		}
+	});
+
+	$("#editButton_"+id).on("click",function(){
+		$("#updateForm"+id).dialog("open");
+	});
+}
 });
