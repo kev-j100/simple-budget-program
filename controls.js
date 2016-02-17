@@ -10,9 +10,10 @@ $(function(){
 	var db = new Dexie("budget-database");
 
 	db.version(1).stores({
-		accounts: '++id,name,total,type,notes'
+		accounts: '++id,name,total,type,notes',
+		credits: '++id,total,credit_from,notes,date,accountKey',
+		debits: '++id,total,debit_to,notes,date,accountKey'
 	});
-
 //Open the database
 	db.open();
 
@@ -32,6 +33,8 @@ function tableSetup(){
     updateAccount(accounts.id);
 	makeCreditDialog(accounts.id);
     creditAccount(accounts.id);
+	makeDebitDialog(accounts.id);
+	debitAccount(accounts.id);
 	});
 }
 
@@ -42,6 +45,7 @@ function refreshAccountTable(){
 	$(".deleteAccountDialogDiv").remove();
 	$(".updateDialogContainDiv").remove();
 	$(".creditDiv").remove();
+	$(".debitDiv").remove();
 	tableSetup();
 }
 
@@ -71,12 +75,18 @@ function makeDeleteDialog(name,id){
 
 //Adds a dialog to update accounts
 function makeUpdateDialog(name,total,type,notes,id){
-	$("body").append("<div id='updateForm"+id+"' class='updateDialogContainDiv'><form id='update-form-form"+id+"'><fieldset><label>Name:</label><input type='text' id='accountNameEntered' name='accountNameEntered' value='"+name+"'/><label>Total:</label><input type='number' step='.01' id='accountTotalEntered' name='Total' value='0.00'/><label>Type:</label><input type='text' id='accountTypeEntered' name='accountTypeEntered'/><label>Notes:</label><textarea rows='4' cols='20' id='accountNotesEntered' name='accountNotesEntered'></textarea></fieldset></form></div>");
+	//console.log(notes);
+	$("body").append("<div id='updateForm"+id+"' class='updateDialogContainDiv'><form id='update-form-form"+id+"'><fieldset><label>Name:</label><input type='text' id='accountNameEntered' name='accountNameEntered' value='"+name+"'/><label>Total:</label><input type='number' step='.01' id='accountTotalEntered' name='Total' value='"+total+"'/><label>Type:</label><input type='text' id='accountTypeEntered' name='accountTypeEntered' value='"+type+"'/><label>Notes:</label><textarea rows='4' cols='20' id='accountNotesEntered' name='accountNotesEntered' value='"+notes+"'>"+notes+"</textarea></fieldset></form></div>");
+}
+
+//Adds a dialog to the body for Credit
+function makeCreditDialog(id){
+	$("body").append("<div id='creditForm"+id+"' class='creditDiv'><h2>Credit</h2><form id='credit-form-form'><label>Total:</label><input id='creditTotalEntered' type='number' step='.01' value='0.00'/><label>Credit From:</label><input type='text' id='creditFromEntered'/><label>Notes:</label><textarea rows='4' cols='20' id='creditNotesEntered'/><label>Date:</label><input type='date' id='creditDateEntered'/></form></div>");
 }
 
 //Adds a dialog to the body for Debit
-function makeCreditDialog(id){
-	$("body").append("<div id='creditForm"+id+"' class='creditDiv'><h2>Credit</h2><form><label>Total:</label><input id='creditTotal"+ id +"' type='number' step='.01' value='0.00'/><label>Credit From:</label><input type='text' id='creditFrom"+ id +"'/><label>Notes:</label><textarea rows='4' cols='20' id='creditNotes"+ id +"'/><label>Date:</label><input type='date' id='creditDate"+ id +"'/></form></div>");
+function makeDebitDialog(id){
+	$("body").append("<div id='debitForm"+id+"' class='debitDiv'><h2>Debit</h2><form id='debit-form-form'><label>Total:</label><input id='debitTotalEntered' type='number' step='.01' value='0.00'/><label>Debit To:</label><input type='text' id='debitFromEntered'/><label>Notes:</label><textarea rows='4' cols='20' id='debitNotesEntered'/><label>Date:</label><input type='date' id='debitDateEntered'/></form></div>");
 }
 
 //Add to the account
@@ -168,7 +178,7 @@ function updateAccount(id){
 				db.accounts.update(id,{name: $("#updateForm"+id+" #accountNameEntered").val()});
 				db.accounts.update(id,{total: $("#updateForm"+id+" #accountTotalEntered").val()});
 				db.accounts.update(id,{type: $("#updateForm"+id+" #accountTypeEntered").val()});
-				db.accounts.update(id,{type: $("#updateForm"+id+" #accountNotesEntered").val()});
+				db.accounts.update(id,{notes: $("#updateForm"+id+" #accountNotesEntered").val()});
 			    refreshAccountTable();
 			},
 		Cancel: function(){
@@ -186,6 +196,7 @@ function updateAccount(id){
 	});
 }
 
+//Credit form fuction
 function creditAccount(id){
 	$("#creditForm"+id).dialog({
 		autoOpen:false,
@@ -195,10 +206,17 @@ function creditAccount(id){
 		buttons: {
 			"Add Credit": function(){
 				$(this).dialog("close");
-				console.log($("#updateForm"+id+" #accountNameEntered").val());
-				console.log($("#updateForm"+id+" #accountTotalEntered").val());
-				console.log($("#updateForm"+id+" #accountTypeEntered").val());
-				console.log($("#updateForm"+id+" #accountNotesEntered").val());
+            var creditTotal = $("#creditForm"+id+" #creditTotalEntered").val();
+			var creditFrom = $("#creditFrom"+id+" #creditFromEntered").val();
+			var creditNotes = $("#creditFrom"+id+" #creditNotesEntered").val();
+			var creditDate = $("#creditFrom"+id+" #creditDateEntered").val();
+
+				db.transaction('rw',db.accounts,db.credits,function(){
+				   db.credits.add({total:creditTotal,credit_from:creditFrom,notes:creditNotes,date:creditDate,accountKey:id});
+				}).catch(function(error){
+					alert("Ooops: " + error);
+				});
+
 			    refreshAccountTable();
 			},
 		Cancel: function(){
@@ -213,6 +231,45 @@ function creditAccount(id){
 
 	$("#Credit"+id).on("click",function(){
 		$("#creditForm"+id).dialog("open");
+	});
+}
+
+//Debit form function
+function debitAccount(id){
+	$("#debitForm"+id).dialog({
+		autoOpen:false,
+		height: 300,
+		width:350,
+		modal: true,
+		buttons: {
+			"Add Debit": function(){
+				$(this).dialog("close");
+            var debitTotal = $("#debitForm"+id+" #debitTotalEntered").val();
+			var debitTo = $("#debitFrom"+id+" #debitFromEntered").val();
+			var debitNotes = $("#debitFrom"+id+" #debitNotesEntered").val();
+			var debitDate = $("#debitFrom"+id+" #debitDateEntered").val();
+
+				db.transaction('rw',db.accounts,db.credits,function(){
+				   db.debits.add({total:debitTotal,debit_to:debitTo,notes:debitNotes,date:debitDate,accountKey:id});
+				}).catch(function(error){
+					alert("Ooops: " + error);
+				});
+
+			    refreshAccountTable();
+			},
+		Cancel: function(){
+			$("#debitForm"+id).dialog("close");
+		}
+	},
+		close:function(){
+			accountForm[0].reset();
+			allAccountFields.removeClass("ui-state-error");
+		}
+	});
+
+	$("#Debit"+id).on("click",function(){
+		console.log("clicked");
+		$("#debitForm"+id).dialog("open");
 	});
 }
 });
