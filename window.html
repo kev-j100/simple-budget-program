@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
   <link rel="stylesheet" href="jquery-ui-1.11.4/jquery-ui.css">
   <style>
   .menuItem{
@@ -11,7 +12,7 @@
       display:inline-block;
   }
   </style>
-</head>
+  </head>
 <body>
 <div id="top-controls">
 +
@@ -20,13 +21,13 @@
 <div id="new-account-form">
 <form id="new-account-form-form">
   <fieldset>
-    <label>Name:</label>
-    <input type="text" id="accountNameEntered" name="accountNameEntered"/>
-    <label>Total:</label>
-    <input type="number" step=".01" id="accountTotalEntered" name="Total" value="0.00"/>
-    <label>Type:</label>
-    <input type="text" id="accountTypeEntered" name="accountTypeEntered"/>
-    <label>Notes:</label>
+    <label for="accountNameEntered">Name:</label><br>
+    <input type="text" id="accountNameEntered" name="accountNameEntered"/><br>
+    <label for="accountTotalDollarsEntered">Total:</label><br>
+    $<input type="number" step="1" id="accountTotalDollarsEntered" name="TotalDollars" value="0" min="0"/>.<input type="number" step="1" id="accountTotalCentsEntered" name="TotalCents" value="00" size="2" min="0" max="99"/><br>
+    <label for="accountTypeEntered">Type:</label><br>
+    <input type="text" id="accountTypeEntered" name="accountTypeEntered"/><br>
+    <label for="accountNotesEntered">Notes:</label><br>
     <textarea rows="4" cols="20" id="accountNotesEntered" name="accountNotesEntered"></textarea>
   </fieldset>
 </form>
